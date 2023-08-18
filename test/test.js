@@ -5,6 +5,10 @@ test("Empty", async t => {
 	t.deepEqual(await find("./test/stubs/empty.js"), []);
 });
 
+test("Doesn’t exist", async t => {
+	t.deepEqual(await find("./test/stubs/THIS_FILE_DOES_NOT_EXIST.js"), []);
+});
+
 test("Simple", async t => {
 	t.deepEqual(await find("./test/stubs/file.js"), ["./test/stubs/imported-secondary.js"]);
 });

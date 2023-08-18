@@ -12,8 +12,8 @@ npm install --save-dev @11ty/dependency-tree-esm
 
 ## Features
 
-* Ignores `node_modules`
-* Ignores Node’s built-ins (e.g. `path`)
+* Ignores bare specifiers (e.g. `import "my-package"`)
+* Ignores Node’s built-ins (e.g. `import "path"`)
 * Handles circular dependencies
 * Returns an empty set if the file does not exist.
 

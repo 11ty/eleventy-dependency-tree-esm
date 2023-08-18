@@ -1,4 +1,5 @@
 import * as acorn from "acorn";
+import { existsSync } from "fs";
 import { readFile } from "fs/promises";
 import { default as normalizePath } from "normalize-path";
 import path from "path";
@@ -66,7 +67,7 @@ export async function find(filePath, alreadyParsedSet = new Set()) {
 	// TODO add a cache here
 	// Unfortunately we need to read the entire file, imports need to be at the top level but they can be anywhere 🫠
 	let normalized = normalizeFilePath(filePath);
-	if(alreadyParsedSet.has(normalized)) {
+	if(alreadyParsedSet.has(normalized) || !existsSync(filePath)) {
 		return [];
 	}
 	alreadyParsedSet.add(normalized);
