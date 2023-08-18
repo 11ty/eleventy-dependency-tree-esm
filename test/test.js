@@ -1,0 +1,26 @@
+import test from "ava";
+import { find } from "../main.js";
+
+test("Empty", async t => {
+	t.deepEqual(await find("./test/stubs/empty.js"), []);
+});
+
+test("Simple", async t => {
+	t.deepEqual(await find("./test/stubs/file.js"), ["./test/stubs/imported-secondary.js"]);
+});
+
+test("Nested two deep", async t => {
+	t.deepEqual(await find("./test/stubs/nested.js"), ["./test/stubs/imported.js", "./test/stubs/imported-secondary.js"]);
+});
+
+test("Nested three deep", async t => {
+	t.deepEqual(await find("./test/stubs/nested-grandchild.js"), ["./test/stubs/nested.js", "./test/stubs/imported.js", "./test/stubs/imported-secondary.js"]);
+});
+
+test("Circular", async t => {
+	t.deepEqual(await find("./test/stubs/circular-parent.js"), ["./test/stubs/circular-child.js"]);
+});
+
+test("Circular Self Reference", async t => {
+	t.deepEqual(await find("./test/stubs/circular-self.js"), ["./test/stubs/empty.js"]);
+});
