@@ -23,13 +23,13 @@ function isNonBareSpecifier(importSource) {
 }
 
 function normalizeFilePath(filePath) {
-	return TemplatePath.addLeadingDotSlash(path.relative(".", filePath));
+	return TemplatePath.standardizeFilePath(path.relative(".", filePath));
 }
 
 function normalizeImportSourceToFilePath(filePath, source) {
 	let { dir } = path.parse(filePath);
 	let normalized = path.join(dir, source);
-	return TemplatePath.addLeadingDotSlash(path.relative(".", normalized));
+	return TemplatePath.standardizeFilePath(path.relative(".", normalized));
 }
 
 async function findByContents(contents, filePath, alreadyParsedSet) {
