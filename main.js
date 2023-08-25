@@ -1,9 +1,10 @@
-import * as acorn from "acorn";
-import { existsSync } from "fs";
-import { readFile } from "fs/promises";
-import { default as normalizePath } from "normalize-path";
-import path from "path";
-import { TemplatePath } from "@11ty/eleventy-utils";
+const path = require("path");
+const { existsSync } = require("fs");
+const { readFile } = require("fs/promises");
+
+const acorn = require("acorn");
+const normalizePath = require("normalize-path");
+const { TemplatePath } = require("@11ty/eleventy-utils");
 
 // Is *not* a bare specifier (e.g. 'some-package')
 // https://nodejs.org/dist/latest-v18.x/docs/api/esm.html#terminology
@@ -63,7 +64,7 @@ async function findByContents(contents, filePath, alreadyParsedSet) {
 	return Array.from(sources);
 }
 
-export async function find(filePath, alreadyParsedSet = new Set()) {
+async function find(filePath, alreadyParsedSet = new Set()) {
 	// TODO add a cache here
 	// Unfortunately we need to read the entire file, imports need to be at the top level but they can be anywhere 🫠
 	let normalized = normalizeFilePath(filePath);
@@ -77,3 +78,7 @@ export async function find(filePath, alreadyParsedSet = new Set()) {
 
 	return sources;
 }
+
+module.exports = {
+	find
+};

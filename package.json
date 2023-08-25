@@ -2,7 +2,6 @@
   "name": "@11ty/dependency-tree-esm",
   "version": "1.0.0",
   "description": "Finds all JavaScript ES Module dependencies from a filename.",
-  "type": "module",
   "main": "main.js",
   "scripts": {
     "test": "npx ava"

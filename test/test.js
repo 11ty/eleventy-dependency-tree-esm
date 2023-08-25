@@ -1,5 +1,5 @@
-import test from "ava";
-import { find } from "../main.js";
+const test = require("ava");
+const { find } = require("../main.js");
 
 test("Empty", async t => {
 	t.deepEqual(await find("./test/stubs/empty.js"), []);

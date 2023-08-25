@@ -25,15 +25,16 @@ npm install --save-dev @11ty/dependency-tree-esm
 // my-file.js
 
 // if my-local-dependency.js has dependencies, it will include those too
-const test = require("./my-local-dependency.js");
+import "./my-local-dependency.js";
+
 
 // ignored, is a built-in
-const path = require("path");
+import path from "path";
 ```
 
 ```js
-const DependencyTree = require("@11ty/dependency-tree");
+const { find } = require("@11ty/dependency-tree-esm");
 
-DependencyTree("./my-file.js");
+find("./my-file.js");
 // returns ["./my-local-dependency.js"]
 ```
