@@ -35,6 +35,6 @@ import path from "path";
 ```js
 const { find } = require("@11ty/dependency-tree-esm");
 
-find("./my-file.js");
+await find("./my-file.js");
 // returns ["./my-local-dependency.js"]
 ```
