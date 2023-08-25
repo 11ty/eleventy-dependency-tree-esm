@@ -1,6 +1,8 @@
-# `@11ty/dependency-tree-esm`
+# `dependency-tree-esm`
 
 Returns an unordered array of local paths to dependencies of a Node ES module JavaScript file.
+
+* See also: [`dependency-tree`](https://github.com/11ty/eleventy-dependency-tree) for the CommonJS version.
 
 This is used by Eleventy to find dependencies of a JavaScript file to watch for changes to re-run Eleventy’s build.
 
