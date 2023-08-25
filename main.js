@@ -29,7 +29,7 @@ function normalizeFilePath(filePath) {
 function normalizeImportSourceToFilePath(filePath, source) {
 	let { dir } = path.parse(filePath);
 	let normalized = path.join(dir, source);
-	return TemplatePath.standardizeFilePath(path.relative(".", normalized));
+	return normalizeFilePath(normalized);
 }
 
 async function findByContents(contents, filePath, alreadyParsedSet) {
