@@ -3,6 +3,7 @@ const { existsSync } = require("fs");
 const { readFile } = require("fs/promises");
 
 const acorn = require("acorn");
+const { importAssertions } = require("acorn-import-assertions");
 const normalizePath = require("normalize-path");
 const { TemplatePath } = require("@11ty/eleventy-utils");
 
@@ -37,9 +38,19 @@ async function findByContents(contents, filePath, alreadyParsedSet) {
 	// Should we use dependency-graph for these relationships?
 	let sources = new Set();
 
-	let ast = acorn.parse(contents, {sourceType: "module", ecmaVersion: "latest"});
+	let parser = acorn.Parser.extend(importAssertions);
+
+	let ast = parser.parse(contents, {
+		sourceType: "module",
+		ecmaVersion: "latest"
+	});
+
 	for(let node of ast.body) {
-		if(node.type === "ImportDeclaration" && isNonBareSpecifier(node.source.value)) {
+		if(
+			node.type === "ImportDeclaration" &&
+			!("assertions" in node) &&
+			isNonBareSpecifier(node.source.value)
+		) {
 			let normalized = normalizeImportSourceToFilePath(filePath, node.source.value);
 			if(sources.has(normalized) || normalized === filePath) {
 				continue;

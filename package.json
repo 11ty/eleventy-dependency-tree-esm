@@ -19,6 +19,7 @@
   "dependencies": {
     "@11ty/eleventy-utils": "^1.0.2",
     "acorn": "^8.10.0",
+    "acorn-import-assertions": "^1.9.0",
     "dependency-graph": "^1.0.0",
     "normalize-path": "^3.0.0"
   },
