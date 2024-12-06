@@ -17,20 +17,22 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@11ty/eleventy-utils": "^1.0.2",
-    "acorn": "^8.10.0",
+    "@11ty/eleventy-utils": "^1.0.3",
+    "acorn": "^8.14.0",
     "dependency-graph": "^1.0.0",
     "normalize-path": "^3.0.0"
   },
   "devDependencies": {
-    "ava": "^5.3.1"
+    "ava": "^6.2.0"
   },
   "ava": {
     "files": [
       "./test/*.js"
     ],
-    "ignoredByWatcher": [
-      "./test/stubs/**"
-    ]
+    "watchMode": {
+      "ignoreChanges": [
+        "./test/stubs/**"
+      ]
+    }
   }
 }

@@ -28,3 +28,8 @@ test("Circular", async t => {
 test("Circular Self Reference", async t => {
 	t.deepEqual(await find("./test/stubs/circular-self.js"), ["./test/stubs/empty.js"]);
 });
+
+// https://github.com/11ty/eleventy-dependency-tree-esm/issues/2
+test("Import Attributes, issue #2", async t => {
+	t.deepEqual(await find("./test/stubs/import-attributes.js"), ["./test/stubs/imported.json"]);
+});
