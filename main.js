@@ -33,24 +33,38 @@ function normalizeImportSourceToFilePath(filePath, source) {
 	return normalizeFilePath(normalized);
 }
 
+function getImportAttributeType(attributes = []) {
+	for(let node of attributes) {
+		if(node.type === "ImportAttribute" && node.key.type === "Identifier" && node.key.name === "type") {
+			return node.value.value;
+		}
+	}
+}
+
 async function findByContents(contents, filePath, alreadyParsedSet) {
 	// Should we use dependency-graph for these relationships?
 	let sources = new Set();
+	let nestedSources = new Set();
 
 	let ast = acorn.parse(contents, {sourceType: "module", ecmaVersion: "latest"});
+
 	for(let node of ast.body) {
 		if(node.type === "ImportDeclaration" && isNonBareSpecifier(node.source.value)) {
+			let importAttributeType = getImportAttributeType(node?.attributes);
 			let normalized = normalizeImportSourceToFilePath(filePath, node.source.value);
-			if(sources.has(normalized) || normalized === filePath) {
-				continue;
-			}
+			if(normalized !== filePath) {
+				sources.add(normalized);
 
-			sources.add(normalized);
+				// Right now only `css` and `json` are valid but others might come later
+				if(!importAttributeType) {
+					nestedSources.add(normalized);
+				}
+			}
 		}
 	}
 
 	// Recurse for nested deps
-	for(let source of sources) {
+	for(let source of nestedSources) {
 		let s = await find(source, alreadyParsedSet);
 		for(let p of s) {
 			if(sources.has(p) || p === filePath) {
