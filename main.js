@@ -1,6 +1,5 @@
 const path = require("path");
-const { existsSync } = require("fs");
-const { readFile } = require("fs/promises");
+const { readFileSync, existsSync } = require("node:fs");
 
 const acorn = require("acorn");
 const normalizePath = require("normalize-path");
@@ -87,7 +86,7 @@ async function find(filePath, alreadyParsedSet = new Set()) {
 	}
 	alreadyParsedSet.add(normalized);
 
-	let contents = await readFile(normalized, { encoding: 'utf8' });
+	let contents = readFileSync(normalized, "utf8");
 	let sources = await findByContents(contents, normalized, alreadyParsedSet);
 
 	return sources;
