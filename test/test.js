@@ -1,5 +1,6 @@
 const test = require("ava");
 const { find, findGraph } = require("../main.js");
+const { DepGraph } = require("dependency-graph");
 
 test("Empty", async t => {
 	t.deepEqual(await find("./test/stubs/empty.js"), []);
@@ -70,4 +71,9 @@ test("findGraph", async t => {
 		"./test/stubs/nested.js",
 		"./test/stubs/nested-grandchild.js",
 	]);
+});
+
+test("findGraph on nonexistent", async t => {
+	let g = await findGraph("./test/stubs/does-not-exist.js");
+	t.true(g instanceof DepGraph);
 });

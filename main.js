@@ -119,7 +119,7 @@ async function findGraph(filePath, alreadyParsedSet = new Set()) {
 	graph.addNode(filePath);
 
 	if(alreadyParsedSet.has(normalized) || !existsSync(filePath)) {
-		return [];
+		return graph;
 	}
 	alreadyParsedSet.add(normalized);
 
