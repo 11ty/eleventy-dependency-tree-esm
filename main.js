@@ -4,6 +4,7 @@ const { readFileSync, existsSync } = require("node:fs");
 const acorn = require("acorn");
 const normalizePath = require("normalize-path");
 const { TemplatePath } = require("@11ty/eleventy-utils");
+const { DepGraph } = require("dependency-graph");
 
 // Is *not* a bare specifier (e.g. 'some-package')
 // https://nodejs.org/dist/latest-v18.x/docs/api/esm.html#terminology
@@ -40,10 +41,9 @@ function getImportAttributeType(attributes = []) {
 	}
 }
 
-async function findByContents(contents, filePath, alreadyParsedSet) {
-	// Should we use dependency-graph for these relationships?
+async function getSources(filePath, contents) {
 	let sources = new Set();
-	let nestedSources = new Set();
+	let sourcesToRecurse = new Set();
 
 	let ast = acorn.parse(contents, {sourceType: "module", ecmaVersion: "latest"});
 
@@ -54,16 +54,36 @@ async function findByContents(contents, filePath, alreadyParsedSet) {
 			if(normalized !== filePath) {
 				sources.add(normalized);
 
+				// Recurse typeless (JavaScript) import types only
 				// Right now only `css` and `json` are valid but others might come later
 				if(!importAttributeType) {
-					nestedSources.add(normalized);
+					sourcesToRecurse.add(normalized);
 				}
 			}
 		}
 	}
 
+	
+	return {
+		sources,
+		sourcesToRecurse,
+	}
+}
+
+async function find(filePath, alreadyParsedSet = new Set()) {
+	// TODO add a cache here
+	// Unfortunately we need to read the entire file, imports need to be at the top level but they can be anywhere 🫠
+	let normalized = normalizeFilePath(filePath);
+	if(alreadyParsedSet.has(normalized) || !existsSync(filePath)) {
+		return [];
+	}
+	alreadyParsedSet.add(normalized);
+
+	let contents = readFileSync(normalized, { encoding: 'utf8' });
+	let { sources, sourcesToRecurse } = await getSources(filePath, contents);
+
 	// Recurse for nested deps
-	for(let source of nestedSources) {
+	for(let source of sourcesToRecurse) {
 		let s = await find(source, alreadyParsedSet);
 		for(let p of s) {
 			if(sources.has(p) || p === filePath) {
@@ -77,21 +97,52 @@ async function findByContents(contents, filePath, alreadyParsedSet) {
 	return Array.from(sources);
 }
 
-async function find(filePath, alreadyParsedSet = new Set()) {
-	// TODO add a cache here
-	// Unfortunately we need to read the entire file, imports need to be at the top level but they can be anywhere 🫠
+function mergeGraphs(rootGraph, ...graphs) {
+	if(!(rootGraph instanceof DepGraph)) {
+		throw new Error("Incorrect type passed to mergeGraphs, expected DepGraph");
+	}
+	for(let g of graphs) {
+		for(let node of g.overallOrder()) {
+			if(!rootGraph.hasNode(node)) {
+				rootGraph.addNode(node);
+			}
+			for(let dep of g.directDependenciesOf(node)) {
+				rootGraph.addDependency(node, dep);
+			}
+		}
+	}
+}
+
+async function findGraph(filePath, alreadyParsedSet = new Set()) {
+	let graph = new DepGraph();
 	let normalized = normalizeFilePath(filePath);
+	graph.addNode(filePath);
+
 	if(alreadyParsedSet.has(normalized) || !existsSync(filePath)) {
 		return [];
 	}
 	alreadyParsedSet.add(normalized);
 
 	let contents = readFileSync(normalized, "utf8");
-	let sources = await findByContents(contents, normalized, alreadyParsedSet);
+	let { sources, sourcesToRecurse } = await getSources(filePath, contents);
+	for(let source of sources) {
+		if(!graph.hasNode(source)) {
+			graph.addNode(source);
+		}
+		graph.addDependency(normalized, source);
+	}
 
-	return sources;
+	// Recurse for nested deps
+	for(let source of sourcesToRecurse) {
+		let recursedGraph = await findGraph(source, alreadyParsedSet);
+		mergeGraphs(graph, recursedGraph);
+	}
+
+	return graph;
 }
 
 module.exports = {
-	find
+	find,
+	findGraph,
+	mergeGraphs,
 };

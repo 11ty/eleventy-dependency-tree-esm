@@ -33,8 +33,21 @@ import path from "path";
 ```
 
 ```js
-const { find } = require("@11ty/dependency-tree-esm");
+import { find } from "@11ty/dependency-tree-esm";
+// CommonJS is fine too
+// const { find } = require("@11ty/dependency-tree-esm");
 
 await find("./my-file.js");
 // returns ["./my-local-dependency.js"]
+```
+
+Return a [dependency-graph](https://github.com/jriecken/dependency-graph) instance:
+
+```js
+import { findGraph } from "@11ty/dependency-tree-esm";
+// CommonJS is fine too
+// const { find } = require("@11ty/dependency-tree-esm");
+
+(await findGraph("./my-file.js")).overallOrder();
+// returns ["./my-local-dependency.js", "./my-file.js"]
 ```
