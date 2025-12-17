@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require("node:path");
 const { readFileSync, existsSync } = require("node:fs");
 
 const acorn = require("acorn");
