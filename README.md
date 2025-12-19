@@ -1,4 +1,7 @@
-# `dependency-tree-esm`
+# `@11ty/dependency-tree-esm`
+
+> [!WARNING]
+> This plugin has moved to [`11ty/eleventy-utils/parse-deps-esm`](https://github.com/11ty/eleventy-utils/tree/main/parse-deps-esm).
 
 Returns an unordered array of local paths to dependencies of a Node ES module JavaScript file.
 
